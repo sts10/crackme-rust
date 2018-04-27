@@ -11,14 +11,14 @@ pub type Credential = [u8; CREDENTIAL_LEN];
 fn main() {
     let password = "tanbark artistic callus";
     let salt = "00bb202b205f064e30f6fae101162a2e";
-    // might able to just do 'let salt = "e628cf2534f66ca172b1ebd82394563a".as_bytes();`
+    // might be able to just do 'let salt = "e628cf2534f66ca172b1ebd82394563a".as_bytes();`
     // but I'm not sure
     let mut salt_vec = Vec::new(); // gonna be Vec<u8>
     for c in salt.chars() {
         salt_vec.push(c as u8);
     }
 
-    println!("salt vexc is {:?}", salt_vec);
+    println!("salt vec is {:?}", salt_vec);
 
     let iterations = 100000;
     let mut to_store: Credential = [0u8; CREDENTIAL_LEN];

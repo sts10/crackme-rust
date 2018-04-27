@@ -40,4 +40,5 @@ fn main() {
     println!("as string {}", lower);
     // I get e6941d24abc7fb69af91d69b8710175c3f7ac67969ec1fa8f7cf819c8d3e7
     println!("should be 91976be95cd28e55e580ee9f69a2139202a9b65eabfbbf33c99bc42e3665564d");
+    // according to https://github.com/agilebits/crackme/blob/master/doc/answers-2018-03-30.json#L9
 }

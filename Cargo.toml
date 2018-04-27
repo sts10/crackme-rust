@@ -1,0 +1,7 @@
+[package]
+name = "crackme-rust"
+version = "0.1.0"
+authors = ["sts10 <sschlinkert@gmail.com>"]
+
+[dependencies]
+ring = "0.13.0-alpha"

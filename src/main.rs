@@ -15,34 +15,32 @@ fn main() {
     // let salt = "e628cf2534f66ca172b1ebd82394563a";
     let iterations = 100000;
 
-    // https://stackoverflow.com/a/44532957
-    let mut salt_vec_radix2 = Vec::new();
+    derive(iterations, salt, password);
+}
+fn derive(iterations: u32, salt: &str, password: &str) {
+    // first, make salt_vec (thanks to https://stackoverflow.com/a/44532957)
+    let mut salt_vec = Vec::new();
     for i in 0..(salt.len() / 2) {
         let mut byte = u8::from_str_radix(&salt[2 * i..2 * i + 2].to_string(), 16).unwrap();
-        salt_vec_radix2.push(byte);
+        salt_vec.push(byte);
     }
 
-    derive(iterations, salt_vec_radix2, password);
-}
-fn derive(iterations: u32, salt_vec: Vec<u8>, password: &str) {
     println!("------------------");
-    let mut to_store: Credential = [0u8; CREDENTIAL_LEN];
-    println!("to_store is len {}", to_store.len());
+    let mut derived_hash: Credential = [0u8; CREDENTIAL_LEN];
 
     pbkdf2::derive(
         DIGEST_ALG,
         iterations,
         &salt_vec,
         password.as_bytes(),
-        &mut to_store,
+        &mut derived_hash,
     );
 
-    println!("out: {:?}", to_store);
-    println!("out length: {}", to_store.len());
+    // println!("out: {:?}", derived_hash);
+    // println!("out length: {}", derived_hash.len());
 
     let mut lower = String::new();
-    for &byte in to_store.iter() {
-        // println!("byte is {:02x}", byte);
+    for &byte in derived_hash.iter() {
         write!(&mut lower, "{:02x}", byte);
     }
 

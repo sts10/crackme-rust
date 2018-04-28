@@ -12,12 +12,8 @@ const CREDENTIAL_LEN: usize = digest::SHA256_OUTPUT_LEN; // or just put 32
 pub type Credential = [u8; CREDENTIAL_LEN];
 
 fn main() {
-    // let salt = "00bb202b205f064e30f6fae101162a2e";
-    // let derived = "dc61e18eaa1add3e555cd493acb9088449d2ac07a739eec15cd299a327bf45b0";
-    // let iterations = 100000;
-    // run_crack(iterations, salt, derived);
-
-    let password = "aardvark aardvark abandon";
+    // let password = "aardvark aardvark abandon";
+    let password = "aardvark abaci meeting";
     let salt = "00bb202b205f064e30f6fae101162a2e";
     let iterations = 100000;
     let derived = derive(iterations, salt, password);
@@ -51,7 +47,7 @@ fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> St
                     println!("Tried {} unsuccessfully", password_guess);
                     // clear third_word
                     password_guess_vec.truncate(2);
-                    println!("vec is now {:?}", password_guess_vec);
+                    // println!("vec is now {:?}", password_guess_vec);
                 }
             }
             // clear second_word
@@ -90,7 +86,7 @@ fn derive(iterations: u32, salt: &str, password: &str) -> String {
         salt_vec.push(byte);
     }
 
-    println!("------------------");
+    // println!("------------------");
     let mut derived_hash: Credential = [0u8; CREDENTIAL_LEN];
 
     pbkdf2::derive(
@@ -150,6 +146,16 @@ fn guess_example1() {
 #[test]
 fn crack_test1() {
     let password = "aardvark aardvark abandon";
+    let salt = "00bb202b205f064e30f6fae101162a2e";
+    let iterations = 100000;
+    let derived = derive(iterations, salt, password);
+
+    assert_eq!(run_crack(iterations, salt, &derived), password);
+}
+
+#[test]
+fn crack_test2() {
+    let password = "aardvark abaci meeting";
     let salt = "00bb202b205f064e30f6fae101162a2e";
     let iterations = 100000;
     let derived = derive(iterations, salt, password);

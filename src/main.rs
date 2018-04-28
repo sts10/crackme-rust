@@ -14,28 +14,9 @@ pub type Credential = [u8; CREDENTIAL_LEN];
 fn main() {
     let salt = "00bb202b205f064e30f6fae101162a2e";
     let derived = "dc61e18eaa1add3e555cd493acb9088449d2ac07a739eec15cd299a327bf45b0";
-    // let password = "node tuesday imperial";
-    // let salt = "e628cf2534f66ca172b1ebd82394563a";
     let iterations = 100000;
     run_crack2(iterations, salt, derived);
 }
-// fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> String {
-//     let first_words = make_word_list("agile_words.txt");
-//     let second_words = make_word_list("agile_words.txt");
-//     let third_words = make_word_list("agile_words.txt");
-//     for first_word in first_words {
-//         for second_word in second_words {
-//             for third_word in third_words {
-//                 let password_guess = first_word + " " + &second_word + " " + &third_word;
-//                 if guess(&password_guess, given_iterations, given_salt, given_derived) {
-//                     println!("Found it! {}", password_guess);
-//                     return password_guess;
-//                 }
-//             }
-//         }
-//     }
-//     return "Didn't crack".to_string();
-// }
 
 fn run_crack2(given_iterations: u32, given_salt: &str, given_derived: &str) {
     let words1 = make_word_list("agile_words.txt");

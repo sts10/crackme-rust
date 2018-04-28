@@ -42,7 +42,7 @@ fn derive(iterations: u32, salt: &str, password: &str) -> String {
 
     let mut lower = String::new();
     for &byte in derived_hash.iter() {
-        write!(&mut lower, "{:02x}", byte);
+        write!(&mut lower, "{:02x}", byte).expect("Unable to write byte");
     }
     return lower;
 }

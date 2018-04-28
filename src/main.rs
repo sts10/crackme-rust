@@ -28,19 +28,17 @@ fn main() {
 }
 
 fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> String {
-    let words1 = make_word_list("agile_words.txt");
-    let words2 = make_word_list("agile_words.txt");
-    let words3 = make_word_list("agile_words.txt");
+    let words = make_word_list("agile_words.txt");
     let mut password_guess_vec: Vec<&str> = [].to_vec();
 
-    for i in 0..words1.len() {
-        let first_word = &words1[i];
+    for i in 0..words.len() {
+        let first_word = &words[i];
         password_guess_vec.push(first_word);
-        for j in 0..words2.len() {
-            let second_word = &words2[j];
+        for j in 0..words.len() {
+            let second_word = &words[j];
             password_guess_vec.push(second_word);
-            for k in 0..words3.len() {
-                password_guess_vec.push(&words3[k]);
+            for k in 0..words.len() {
+                password_guess_vec.push(&words[k]);
                 let password_guess = password_guess_vec.join(" ").to_string();
                 if guess(&password_guess, given_iterations, given_salt, given_derived) {
                     println!("Found it! {}", password_guess);

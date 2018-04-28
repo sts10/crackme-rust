@@ -19,21 +19,12 @@ fn main() {
     let iterations = 100000;
     let derived = derive(iterations, salt, password);
 
+    // now, let's try to crack that derived hash
     let start_time = time::now();
     run_crack(iterations, salt, &derived);
     let end_time = time::now();
 
-    // here's a bunch of code that basically benchmarks the above function run
-    let duration: u64 = (end_time.tm_sec - start_time.tm_sec) as u64;
-    let word_count: u64 = 18328;
-    let total_passwords_to_check: u64 = word_count * word_count * word_count;
-    let estimated_run_through: u64 = duration * total_passwords_to_check / 100 / 60 / 60 / 24 / 365;
-    println!(
-        "Estimated full run through: {:?} years",
-        estimated_run_through
-    );
-    println!("Lets say I figured out how to run this on my 8 threads, and that the mystery password is halfway through the list. That's still {:?} years.",
-             estimated_run_through / 16);
+    print_benchmark_info(start_time, end_time);
 }
 
 fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> String {
@@ -114,6 +105,20 @@ fn derive(iterations: u32, salt: &str, password: &str) -> String {
         write!(&mut lower, "{:02x}", byte).expect("Unable to write byte");
     }
     return lower;
+}
+
+fn print_benchmark_info(start_time: time::Tm, end_time: time::Tm) {
+    // would be better if I got this down to the nanosecond...
+    let duration: u64 = (end_time.tm_sec - start_time.tm_sec) as u64;
+    let word_count: u64 = 18328;
+    let total_passwords_to_check: u64 = word_count * word_count * word_count;
+    let estimated_run_through: u64 = duration * total_passwords_to_check / 100 / 60 / 60 / 24 / 365;
+    println!(
+        "Estimated full run through: {:?} years",
+        estimated_run_through
+    );
+    println!("Lets say I figured out how to run this on my 8 threads, and that the mystery password is halfway through the list. That's still {:?} years.",
+             estimated_run_through / 16);
 }
 
 #[test]

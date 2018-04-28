@@ -26,7 +26,8 @@ fn main() {
     // https://stackoverflow.com/a/44532957
     let mut salt_vec_radix2 = Vec::new();
     for i in 0..(salt.len() / 2) {
-        salt_vec_radix2.push(u8::from_str_radix(&salt[2 * i..2 * i + 2].to_string(), 16).unwrap());
+        let mut byte = u8::from_str_radix(&salt[2 * i..2 * i + 2].to_string(), 16).unwrap();
+        salt_vec_radix2.push(byte);
     }
 
     // println!("salt vec is {:?}", salt_vec);
@@ -56,7 +57,8 @@ fn derive(iterations: u32, salt_vec: Vec<u8>, password: &str) {
 
     let mut lower = String::new();
     for &byte in to_store.iter() {
-        write!(&mut lower, "{:x}", byte);
+        // println!("byte is {:02x}", byte);
+        write!(&mut lower, "{:02x}", byte);
     }
 
     println!("as string {}", lower);

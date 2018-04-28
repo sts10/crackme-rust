@@ -21,6 +21,7 @@ name = "crackme-rust"
 version = "0.1.0"
 dependencies = [
  "ring 0.12.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -137,6 +138,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "redox_syscall"
+version = "0.1.37"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "ring"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -152,6 +158,16 @@ dependencies = [
 name = "scopeguard"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "time"
+version = "0.1.39"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "libc 0.2.40 (registry+https://github.com/rust-lang/crates.io-index)",
+ "redox_syscall 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)",
+ "winapi 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "untrusted"
@@ -196,8 +212,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum rand 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "eba5f8cb59cc50ed56be8880a5c7b496bfd9bd26394e176bc67884094145c2c5"
 "checksum rayon 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)" = "b614fe08b6665cb9a231d07ac1364b0ef3cb3698f1239ee0c4c3a88a524f54c8"
 "checksum rayon-core 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "9d24ad214285a7729b174ed6d3bcfcb80177807f959d95fafd5bfc5c4f201ac8"
+"checksum redox_syscall 0.1.37 (registry+https://github.com/rust-lang/crates.io-index)" = "0d92eecebad22b767915e4d529f89f28ee96dbbf5a4810d2b844373f136417fd"
 "checksum ring 0.12.1 (registry+https://github.com/rust-lang/crates.io-index)" = "6f7d28b30a72c01b458428e0ae988d4149c20d902346902be881e3edc4bb325c"
 "checksum scopeguard 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "94258f53601af11e6a49f722422f6e3425c52b06245a5cf9bc09908b174f5e27"
+"checksum time 0.1.39 (registry+https://github.com/rust-lang/crates.io-index)" = "a15375f1df02096fb3317256ce2cee6a1f42fc84ea5ad5fc8c421cfe40c73098"
 "checksum untrusted 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f392d7819dbe58833e26872f5f6f0d68b7bbbe90fc3667e98731c4a15ad9a7ae"
 "checksum winapi 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)" = "04e3bd221fcbe8a271359c04f21a76db7d0c6028862d1bb5512d85e1e2eb5bb3"
 "checksum winapi-i686-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"

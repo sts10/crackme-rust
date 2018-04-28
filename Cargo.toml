@@ -5,3 +5,4 @@ authors = ["sts10 <sschlinkert@gmail.com>"]
 
 [dependencies]
 ring = "0.12.1"
+time = "0.1"

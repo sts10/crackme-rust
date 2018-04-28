@@ -1,7 +1,7 @@
 extern crate ring;
+extern crate time;
 
-use ring::{digest, pbkdf2};
-// https://briansmith.org/rustdoc/ring/pbkdf2/index.html
+use ring::{digest, pbkdf2}; // https://briansmith.org/rustdoc/ring/pbkdf2/index.html
 use std::fmt::Write;
 use std::io::BufReader;
 use std::io::BufRead;
@@ -12,20 +12,34 @@ const CREDENTIAL_LEN: usize = digest::SHA256_OUTPUT_LEN; // or just put 32
 pub type Credential = [u8; CREDENTIAL_LEN];
 
 fn main() {
-    // let password = "aardvark aardvark abandon";
-    let password = "aardvark abaci meeting";
+    // let's try to crack the 100th password on the list
+    let password = "aardvark aardvark accolade";
+    // first, we'll derive the hash of this password
     let salt = "00bb202b205f064e30f6fae101162a2e";
     let iterations = 100000;
     let derived = derive(iterations, salt, password);
 
+    let start_time = time::now();
     run_crack(iterations, salt, &derived);
+    let end_time = time::now();
+
+    // here's a bunch of code that basically benchmarks the above function run
+    let duration: u64 = (end_time.tm_sec - start_time.tm_sec) as u64;
+    let word_count: u64 = 18328;
+    let total_passwords_to_check: u64 = word_count * word_count * word_count;
+    let estimated_run_through: u64 = duration * total_passwords_to_check / 100 / 60 / 60 / 24 / 365;
+    println!(
+        "Estimated full run through: {:?} years",
+        estimated_run_through
+    );
+    println!("Lets say I figured out how to run this on my 8 threads, and that the mystery password is halfway through the list. That's still {:?} years.",
+             estimated_run_through / 16);
 }
 
 fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> String {
     let words1 = make_word_list("agile_words.txt");
     let words2 = make_word_list("agile_words.txt");
     let words3 = make_word_list("agile_words.txt");
-    let mut password_guess = String::new();
     let mut password_guess_vec: Vec<&str> = [].to_vec();
 
     for i in 0..words1.len() {
@@ -33,24 +47,20 @@ fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> St
         password_guess_vec.push(first_word);
         for j in 0..words2.len() {
             let second_word = &words2[j];
-            // password_guess_vec.push(" ");
             password_guess_vec.push(second_word);
             for k in 0..words3.len() {
-                // password_guess_vec.push(" ");
                 password_guess_vec.push(&words3[k]);
-                password_guess = password_guess_vec.join(" ");
-                // password_guess = first_word + " " + &second_word + " " + &words3[k];
+                let password_guess = password_guess_vec.join(" ").to_string();
                 if guess(&password_guess, given_iterations, given_salt, given_derived) {
                     println!("Found it! {}", password_guess);
                     return password_guess;
                 } else {
                     println!("Tried {} unsuccessfully", password_guess);
-                    // clear third_word
+                    // clear third_word by truncating vector down to two words
                     password_guess_vec.truncate(2);
-                    // println!("vec is now {:?}", password_guess_vec);
                 }
             }
-            // clear second_word
+            // clear second_word by truncating vector down to one word
             password_guess_vec.truncate(1);
             println!("vec is now {:?}", password_guess_vec);
         }
@@ -98,7 +108,6 @@ fn derive(iterations: u32, salt: &str, password: &str) -> String {
     );
 
     // println!("out: {:?}", derived_hash);
-    // println!("out length: {}", derived_hash.len());
 
     let mut lower = String::new();
     for &byte in derived_hash.iter() {
@@ -153,12 +162,12 @@ fn crack_test1() {
     assert_eq!(run_crack(iterations, salt, &derived), password);
 }
 
-#[test]
-fn crack_test2() {
-    let password = "aardvark abaci meeting";
-    let salt = "00bb202b205f064e30f6fae101162a2e";
-    let iterations = 100000;
-    let derived = derive(iterations, salt, password);
+// #[test]
+// fn crack_test2() {
+//     let password = "aardvark abaci meeting";
+//     let salt = "00bb202b205f064e30f6fae101162a2e";
+//     let iterations = 100000;
+//     let derived = derive(iterations, salt, password);
 
-    assert_eq!(run_crack(iterations, salt, &derived), password);
-}
+//     assert_eq!(run_crack(iterations, salt, &derived), password);
+// }

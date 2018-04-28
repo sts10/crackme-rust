@@ -18,6 +18,13 @@ fn main() {
     println!("I got {}", derive(iterations, salt, password));
     println!("shd b 91976be95cd28e55e580ee9f69a2139202a9b65eabfbbf33c99bc42e3665564d");
 }
+fn guess(password_guess: &str, iterations: u32, salt: &str, derived: &str) -> bool {
+    if derive(iterations, salt, password_guess) == derived {
+        return true;
+    } else {
+        return false;
+    }
+}
 fn derive(iterations: u32, salt: &str, password: &str) -> String {
     // first, make salt_vec (thanks to https://stackoverflow.com/a/44532957)
     let mut salt_vec = Vec::new();
@@ -69,4 +76,16 @@ fn derive_example3() {
     let salt = "5ed20a9710cddc0278cbb345c5a4ac3d";
     let derived = "524098d90da74ed38cb86a5ebf5f4cecd39e52d200d7c32b4606731d5696b3d5";
     assert_eq!(derive(100000, salt, password), derived);
+}
+
+#[test]
+fn guess_example1() {
+    let incorrect_password = "smith artistic callus";
+    let correct_password = "tanbark artistic callus";
+
+    let salt = "00bb202b205f064e30f6fae101162a2e";
+    let derived = "91976be95cd28e55e580ee9f69a2139202a9b65eabfbbf33c99bc42e3665564d";
+
+    assert_eq!(guess(incorrect_password, 100000, salt, derived), false);
+    assert_eq!(guess(correct_password, 100000, salt, derived), true);
 }

@@ -62,7 +62,7 @@ fn guess(password_guess: &str, iterations: u32, salt: &str, derived: &str) -> bo
 }
 fn derive(iterations: u32, salt: &str, password: &str) -> String {
     // first, make salt_vec (thanks to https://stackoverflow.com/a/44532957)
-    let mut salt_vec = Vec::new();
+    let mut salt_vec = vec![];
     for i in 0..(salt.len() / 2) {
         let mut byte = u8::from_str_radix(&salt[2 * i..2 * i + 2].to_string(), 16).unwrap();
         salt_vec.push(byte);

@@ -27,55 +27,38 @@ fn main() {
     print_benchmark_info(start_time, end_time);
 }
 
-fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> String {
+fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> Option<String> {
     let words = make_word_list("agile_words.txt");
-    let mut password_guess_vec: Vec<&str> = [].to_vec();
 
-    for i in 0..words.len() {
-        let first_word = &words[i];
-        password_guess_vec.push(first_word);
-        for j in 0..words.len() {
-            let second_word = &words[j];
-            password_guess_vec.push(second_word);
-            for k in 0..words.len() {
-                password_guess_vec.push(&words[k]);
-                let password_guess = password_guess_vec.join(" ").to_string();
+    for word1 in &words {
+        for word2 in &words {
+            for word3 in &words {
+                let password_guess = format!("{} {} {}", word1, word2, word3);
                 if guess(&password_guess, given_iterations, given_salt, given_derived) {
                     println!("Found it! {}", password_guess);
-                    return password_guess;
+                    return Some(password_guess);
                 } else {
                     println!("Tried {} unsuccessfully", password_guess);
-                    // clear third_word by truncating vector down to two words
-                    password_guess_vec.truncate(2);
                 }
             }
-            // clear second_word by truncating vector down to one word
-            password_guess_vec.truncate(1);
-            println!("vec is now {:?}", password_guess_vec);
         }
-        // clear first_word
-        password_guess_vec = [].to_vec();
     }
-    return String::from("didn't crack");
+    None
 }
 
-fn make_word_list(filename: &str) -> (Vec<String>) {
+fn make_word_list(filename: &str) -> Vec<String> {
     let mut words_vec: Vec<String> = [].to_vec();
 
     let f = File::open(filename).unwrap();
     let file = BufReader::new(&f);
     for line in file.lines() {
-        let l = line.unwrap();
-        words_vec.push(String::from(l));
+        let line = line.unwrap();
+        words_vec.push(line);
     }
-    return words_vec;
+    words_vec
 }
 fn guess(password_guess: &str, iterations: u32, salt: &str, derived: &str) -> bool {
-    if derive(iterations, salt, password_guess) == derived {
-        return true;
-    } else {
-        return false;
-    }
+    derive(iterations, salt, password_guess) == derived
 }
 fn derive(iterations: u32, salt: &str, password: &str) -> String {
     // first, make salt_vec (thanks to https://stackoverflow.com/a/44532957)
@@ -85,7 +68,6 @@ fn derive(iterations: u32, salt: &str, password: &str) -> String {
         salt_vec.push(byte);
     }
 
-    // println!("------------------");
     let mut derived_hash: Credential = [0u8; CREDENTIAL_LEN];
 
     pbkdf2::derive(
@@ -162,7 +144,7 @@ fn crack_test1() {
     let iterations = 100000;
     let derived = derive(iterations, salt, password);
 
-    assert_eq!(run_crack(iterations, salt, &derived), password);
+    assert_eq!(run_crack(iterations, salt, &derived).unwrap(), password);
 }
 
 // #[test]

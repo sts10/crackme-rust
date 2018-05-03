@@ -31,22 +31,12 @@ fn main() {
 
 fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> Option<String> {
     let words = make_word_list("agile_words.txt");
-    // let words2 = make_word_list("agile_words.txt");
-    // let words3 = make_word_list("agile_words.txt");
-
-    // let mut password_guess = "".to_string();
     words
         .par_iter()
         .map(|word1| {
             for word2 in &words {
                 for word3 in &words {
-                    let password_guess = format!("{} {} {}", word1, word2, word3);
-                    // if guess(&password_guess, given_iterations, given_salt, given_derived) {
-                    //     println!("Found it! {}", password_guess);
-                    //     return Some(password_guess);
-                    // } else {
-                    //     println!("Tried {} unsuccessfully", password_guess);
-                    // }
+                    let password_guess = format!("{} {} {}", word1, word2, word3).to_string();
                 }
             }
             None
@@ -59,7 +49,7 @@ fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> Op
                 given_derived,
             )
         })
-        .is_some()
+        .unwrap()
 }
 
 fn make_word_list(filename: &str) -> Vec<String> {

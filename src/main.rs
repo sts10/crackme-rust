@@ -1,7 +1,9 @@
+extern crate rayon;
 extern crate ring;
 extern crate time;
 
 use ring::{digest, pbkdf2}; // https://briansmith.org/rustdoc/ring/pbkdf2/index.html
+use rayon::prelude::*;
 use std::fmt::Write;
 use std::io::BufReader;
 use std::io::BufRead;
@@ -29,21 +31,37 @@ fn main() {
 
 fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> Option<String> {
     let words = make_word_list("agile_words.txt");
+    // let words2 = make_word_list("agile_words.txt");
+    // let words3 = make_word_list("agile_words.txt");
 
-    for word1 in &words {
-        for word2 in &words {
-            for word3 in &words {
-                let password_guess = format!("{} {} {}", word1, word2, word3);
-                if guess(&password_guess, given_iterations, given_salt, given_derived) {
-                    println!("Found it! {}", password_guess);
-                    return Some(password_guess);
-                } else {
-                    println!("Tried {} unsuccessfully", password_guess);
+    // let mut password_guess = "".to_string();
+    words
+        .par_iter()
+        .map(|word1| {
+            for word2 in &words {
+                for word3 in &words {
+                    let password_guess = format!("{} {} {}", word1, word2, word3);
+                    // if guess(&password_guess, given_iterations, given_salt, given_derived) {
+                    //     println!("Found it! {}", password_guess);
+                    //     return Some(password_guess);
+                    // } else {
+                    //     println!("Tried {} unsuccessfully", password_guess);
+                    // }
                 }
             }
-        }
-    }
-    None
+            None
+        })
+        .find_any(|password_guess| {
+            guess(
+                password_guess.unwrap(),
+                given_iterations,
+                given_salt,
+                given_derived,
+            )
+        })
+        .is_some()
+    // Some(password_guess)
+    // .find_any(Option::is_some)
 }
 
 fn make_word_list(filename: &str) -> Vec<String> {

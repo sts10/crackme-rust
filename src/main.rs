@@ -60,8 +60,6 @@ fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> Op
             )
         })
         .is_some()
-    // Some(password_guess)
-    // .find_any(Option::is_some)
 }
 
 fn make_word_list(filename: &str) -> Vec<String> {

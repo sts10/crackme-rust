@@ -38,7 +38,6 @@ fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> St
         .map(|word1| {
             for word2 in &words {
                 for word3 in &words {
-                    // println!("Guessing {} {} {}", &word1, &word2, &word3);
                     let password_guess = format!("{} {} {}", word1, word2, word3);
                     if guess(&password_guess, given_iterations, given_salt, given_derived) {
                         println!("made it inside the if");

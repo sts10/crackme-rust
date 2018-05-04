@@ -15,11 +15,12 @@ pub type Credential = [u8; CREDENTIAL_LEN];
 
 fn main() {
     // let's try to crack the 100th password on the list
-    let password = "aardvark aardvark accolade";
+    // let password = "aardvark aardvark hymnal";
     // first, we'll derive the hash of this password
-    let salt = "00bb202b205f064e30f6fae101162a2e";
+    let salt = "8ad1712ab5d632d8c4dac07b792ebb17";
     let iterations = 100000;
-    let derived = derive(iterations, salt, password);
+    // let derived = derive(iterations, salt, password);
+    let derived = "a3a8b8eb8e739c86f67332d17364b149cd88f33bb11eedae066ac366711ec266";
 
     // now, let's try to crack that derived hash
     let start_time = time::now();
@@ -28,34 +29,36 @@ fn main() {
 
     println!("pqassword is {}", correct_password);
     print_benchmark_info(start_time, end_time);
-    use std::io::Write;
-    let mut f = File::create("output.txt").expect("Unable to create file");
-    write!(f, "Derived: {}", &derived).expect("Unable to write data to file");
-    write!(f, "Correct password: {}", correct_password).expect("Unable to write data to file");
 }
 
 fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> String {
-    let words = make_word_list("test_word_list.txt");
+    let words = make_word_list("agile_words.txt");
     words
         .par_iter()
         .map(|word1| {
             for word2 in &words {
                 for word3 in &words {
-                    println!("Guessing {} {} {}", &word1, &word2, &word3);
+                    // println!("Guessing {} {} {}", &word1, &word2, &word3);
                     let password_guess = format!("{} {} {}", word1, word2, word3);
+                    if guess(&password_guess, given_iterations, given_salt, given_derived) {
+                        println!("made it inside the if");
+
+                        use std::io::Write;
+                        let mut f = File::create("output.txt").expect("Unable to create file");
+                        write!(f, "Derived: {}", given_derived).expect("Unable to write data to file");
+                        write!(f, "Correct password: {}", password_guess).expect("Unable to write data to file");
+
+                        return password_guess;
+                    }
                 }
             }
-            None
+            // None
+            return "Nope".to_string();
         })
         .find_any(|password_guess| {
-            guess(
-                password_guess.unwrap(),
-                given_iterations,
-                given_salt,
-                given_derived,
-            )
+            guess(password_guess, given_iterations, given_salt, given_derived)
         })
-        .unwrap()
+        // .unwrap()
         .unwrap()
         .to_string()
 }
@@ -72,6 +75,7 @@ fn make_word_list(filename: &str) -> Vec<String> {
     words_vec
 }
 fn guess(password_guess: &str, iterations: u32, salt: &str, derived: &str) -> bool {
+    println!("Guessing {}", password_guess);
     derive(iterations, salt, password_guess) == derived
 }
 fn derive(iterations: u32, salt: &str, password: &str) -> String {

@@ -7,3 +7,4 @@ node
 tuesday
 imperial
 horsefly
+hymnal

@@ -1,5 +1,6 @@
 extern crate ring;
 extern crate time;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use ring::{digest, pbkdf2}; // https://briansmith.org/rustdoc/ring/pbkdf2/index.html
 use std::fmt::Write;
@@ -20,11 +21,27 @@ fn main() {
     let derived = derive(iterations, salt, password);
 
     // now, let's try to crack that derived hash
-    let start_time = time::now();
+    let start_time = SystemTime::now();
     run_crack(iterations, salt, &derived);
-    let end_time = time::now();
 
-    print_benchmark_info(start_time, end_time);
+    let end_time = SystemTime::now();
+    let duration = end_time.duration_since(start_time).expect("Time backwards");
+
+    let duration_ms = duration.as_secs() * 1000 + duration.subsec_nanos() as u64 / 1_000_000;
+    println!("I just ran for {:?} milliseconds", duration_ms);
+
+    let word_count: u64 = 18328;
+    let total_passwords_to_check: u64 = word_count * word_count * word_count;
+    let ms_in_a_year = 1000 * 60 * 60 * 24 * 365;
+    let portion_of_total_work: u64 = total_passwords_to_check / 100;
+    println!("portion_of_total_work is {}", portion_of_total_work);
+    let estimated_run_through = duration_ms * portion_of_total_work / ms_in_a_year;
+    println!(
+        "Estimated full run through: {:?} years",
+        estimated_run_through
+    );
+    println!("Lets say I figured out how to run this on my 8 threads, and that the mystery password is halfway through the list. That's still {:?} years.",
+             estimated_run_through / 16);
 }
 
 fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> Option<String> {

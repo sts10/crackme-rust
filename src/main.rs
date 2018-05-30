@@ -1,13 +1,11 @@
-extern crate rayon;
 extern crate ring;
 extern crate time;
 
 use ring::{digest, pbkdf2}; // https://briansmith.org/rustdoc/ring/pbkdf2/index.html
-use rayon::prelude::*;
 use std::fmt::Write;
-use std::io::BufReader;
-use std::io::BufRead;
 use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
 
 static DIGEST_ALG: &'static digest::Algorithm = &digest::SHA256;
 const CREDENTIAL_LEN: usize = digest::SHA256_OUTPUT_LEN; // or just put 32
@@ -15,51 +13,37 @@ pub type Credential = [u8; CREDENTIAL_LEN];
 
 fn main() {
     // let's try to crack the 100th password on the list
-    // let password = "aardvark aardvark hymnal";
+    let password = "aardvark aardvark accolade";
     // first, we'll derive the hash of this password
-    let salt = "8ad1712ab5d632d8c4dac07b792ebb17";
+    let salt = "00bb202b205f064e30f6fae101162a2e";
     let iterations = 100000;
-    // let derived = derive(iterations, salt, password);
-    let derived = "a3a8b8eb8e739c86f67332d17364b149cd88f33bb11eedae066ac366711ec266";
+    let derived = derive(iterations, salt, password);
 
     // now, let's try to crack that derived hash
     let start_time = time::now();
-    let correct_password = run_crack(iterations, salt, &derived);
+    run_crack(iterations, salt, &derived);
     let end_time = time::now();
 
-    println!("pqassword is {}", correct_password);
     print_benchmark_info(start_time, end_time);
 }
 
-fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> String {
+fn run_crack(given_iterations: u32, given_salt: &str, given_derived: &str) -> Option<String> {
     let words = make_word_list("agile_words.txt");
-    words
-        .par_iter()
-        .map(|word1| {
-            for word2 in &words {
-                for word3 in &words {
-                    let password_guess = format!("{} {} {}", word1, word2, word3);
-                    if guess(&password_guess, given_iterations, given_salt, given_derived) {
-                        println!("made it inside the if");
 
-                        use std::io::Write;
-                        let mut f = File::create("output.txt").expect("Unable to create file");
-                        write!(f, "Derived: {}", given_derived).expect("Unable to write data to file");
-                        write!(f, "Correct password: {}", password_guess).expect("Unable to write data to file");
-
-                        return password_guess;
-                    }
+    for word1 in &words {
+        for word2 in &words {
+            for word3 in &words {
+                let password_guess = format!("{} {} {}", word1, word2, word3);
+                if guess(&password_guess, given_iterations, given_salt, given_derived) {
+                    println!("Found it! {}", password_guess);
+                    return Some(password_guess);
+                } else {
+                    println!("Tried {} unsuccessfully", password_guess);
                 }
             }
-            // None
-            return "Nope".to_string();
-        })
-        .find_any(|password_guess| {
-            guess(password_guess, given_iterations, given_salt, given_derived)
-        })
-        // .unwrap()
-        .unwrap()
-        .to_string()
+        }
+    }
+    None
 }
 
 fn make_word_list(filename: &str) -> Vec<String> {
@@ -74,7 +58,6 @@ fn make_word_list(filename: &str) -> Vec<String> {
     words_vec
 }
 fn guess(password_guess: &str, iterations: u32, salt: &str, derived: &str) -> bool {
-    println!("Guessing {}", password_guess);
     derive(iterations, salt, password_guess) == derived
 }
 fn derive(iterations: u32, salt: &str, password: &str) -> String {
@@ -156,21 +139,20 @@ fn guess_example1() {
 
 #[test]
 fn crack_test1() {
-    // let password = "aardvark aardvark abandon";
-    let password = "leftist abbot juror";
+    let password = "aardvark aardvark abandon";
     let salt = "00bb202b205f064e30f6fae101162a2e";
     let iterations = 100000;
     let derived = derive(iterations, salt, password);
 
-    assert_eq!(run_crack(iterations, salt, &derived), password);
+    assert_eq!(run_crack(iterations, salt, &derived).unwrap(), password);
 }
 
-#[test]
-fn crack_test2() {
-    let password = "aardvark abaci meeting";
-    let salt = "00bb202b205f064e30f6fae101162a2e";
-    let iterations = 100000;
-    let derived = derive(iterations, salt, password);
+// #[test]
+// fn crack_test2() {
+//     let password = "aardvark abaci meeting";
+//     let salt = "00bb202b205f064e30f6fae101162a2e";
+//     let iterations = 100000;
+//     let derived = derive(iterations, salt, password);
 
-    assert_eq!(run_crack(iterations, salt, &derived), password);
-}
+//     assert_eq!(run_crack(iterations, salt, &derived), password);
+// }
